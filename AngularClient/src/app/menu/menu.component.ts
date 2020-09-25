@@ -8,6 +8,7 @@ import { AuthService } from '../shared/services/auth.service';
 })
 export class MenuComponent implements OnInit {
   public isUserAuthenticated: boolean = false;
+  public isUserAdmin: boolean = false;
 
   constructor(private _authService: AuthService) {}
 
@@ -15,6 +16,7 @@ export class MenuComponent implements OnInit {
     this._authService.loginChanged
     .subscribe(res => {
       this.isUserAuthenticated = res;
+      this.isAdmin();
     })
   }
 
@@ -24,5 +26,12 @@ export class MenuComponent implements OnInit {
 
   public logout = () => {
     this._authService.logout();
+  }
+
+  public isAdmin = () => {
+    return this._authService.checkIfUserIsAdmin()
+    .then(res => {
+      this.isUserAdmin = res;
+    })
   }
 }

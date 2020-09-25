@@ -10,6 +10,9 @@ import { NotFoundComponent } from './error-pages/not-found/not-found.component';
 import { SigninRedirectCallbackComponent } from './signin-redirect-callback/signin-redirect-callback.component';
 import { SignoutRedirectCallbackComponent } from './signout-redirect-callback/signout-redirect-callback.component';
 import { AuthInterceptorService } from './shared/services/auth-interceptor.service';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
+import { AuthGuardService } from './shared/guards/auth-guard.service';
  
 @NgModule({
   declarations: [
@@ -18,16 +21,20 @@ import { AuthInterceptorService } from './shared/services/auth-interceptor.servi
     MenuComponent,
     NotFoundComponent,
     SigninRedirectCallbackComponent,
-    SignoutRedirectCallbackComponent
+    SignoutRedirectCallbackComponent,
+    PrivacyComponent,
+    UnauthorizedComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     RouterModule.forRoot([
       { path: 'home', component: HomeComponent },
-      { path: 'company', loadChildren: () => import('./company/company.module').then(m => m.CompanyModule) },
+      { path: 'company', loadChildren: () => import('./company/company.module').then(m => m.CompanyModule), canActivate: [AuthGuardService] },
       { path: 'signin-callback', component: SigninRedirectCallbackComponent },
       { path: 'signout-callback', component: SignoutRedirectCallbackComponent },
+      { path: 'privacy', component: PrivacyComponent, canActivate: [AuthGuardService], data: { roles: ['Admin'] } },
+      { path: 'unauthorized', component: UnauthorizedComponent },
       { path: '404', component : NotFoundComponent},
       { path: '', redirectTo: '/home', pathMatch: 'full' },
       { path: '**', redirectTo: '/404', pathMatch: 'full'}

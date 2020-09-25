@@ -69,6 +69,13 @@ export class AuthService {
     })
   }
 
+  public checkIfUserIsAdmin = (): Promise<boolean> => {
+    return this._userManager.getUser()
+    .then(user => {
+      return user?.profile.role === 'Admin';
+    })
+  }
+
   private checkUser = (user : User): boolean => {
     return !!user && !user.expired;
   }

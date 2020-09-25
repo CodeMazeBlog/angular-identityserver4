@@ -1,0 +1,11 @@
+<section style="margin-left: 15px;">
+    <h2>Unauthorized User</h2>
+    <p *ngIf="isUserAuthenticated">
+        You are unauthorized to see the requested page.
+        <button class="btn btn-link" (click)="logout()">Please log out and log in with a different user.</button>
+    </p>
+    <p *ngIf="!isUserAuthenticated">
+        You are unauthorized to see the requested page.
+        <button class="btn btn-link" (click)="login()">Please log in first.</button>
+    </p>
+</section>
