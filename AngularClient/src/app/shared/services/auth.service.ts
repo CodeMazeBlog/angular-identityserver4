@@ -20,12 +20,17 @@ export class AuthService {
       redirect_uri: `${Constants.clientRoot}/signin-callback`,
       scope: "openid profile companyApi",
       response_type: "code",
-      post_logout_redirect_uri: `${Constants.clientRoot}/signout-callback`
+      post_logout_redirect_uri: `${Constants.clientRoot}/signout-callback`,
+      automaticSilentRenew: true,
+      silent_redirect_uri: `${Constants.clientRoot}/assets/silent-callback.html`
     }
   }
 
   constructor() { 
     this._userManager = new UserManager(this.idpSettings);
+    this._userManager.events.addAccessTokenExpired(_ => {
+      this._loginChangedSubject.next(false);
+    });
   }
 
   public login = () => {
@@ -59,6 +64,7 @@ export class AuthService {
 
   public finishLogout = () => {
     this._user = null;
+    this._loginChangedSubject.next(false);
     return this._userManager.signoutRedirectCallback();
   }
 
@@ -72,7 +78,7 @@ export class AuthService {
   public checkIfUserIsAdmin = (): Promise<boolean> => {
     return this._userManager.getUser()
     .then(user => {
-      return user?.profile.role === 'Admin';
+      return !user?.expired && user?.profile.role === 'Admin';
     })
   }
 

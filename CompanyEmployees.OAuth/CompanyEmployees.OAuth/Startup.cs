@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Reflection;
 
 namespace CompanyEmployees.OAuth
@@ -22,20 +23,23 @@ namespace CompanyEmployees.OAuth
         {
             var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            services.AddIdentityServer()
-                .AddTestUsers(InMemoryConfig.GetUsers())
-                .AddDeveloperSigningCredential() //not something we want to use in a production environment;
-                .AddProfileService<CustomProfileService>()
-                .AddConfigurationStore(opt =>
-                 {
-                     opt.ConfigureDbContext = c => c.UseSqlServer(Configuration.GetConnectionString("sqlConnection"),
-                         sql => sql.MigrationsAssembly(migrationAssembly));
-                 })
-                .AddOperationalStore(opt =>
+            services.AddIdentityServer(opt =>
+            {
+                opt.Authentication.CookieLifetime = TimeSpan.FromMinutes(4);
+            })
+            .AddTestUsers(InMemoryConfig.GetUsers())
+            .AddDeveloperSigningCredential() //not something we want to use in a production environment;
+            .AddProfileService<CustomProfileService>()
+            .AddConfigurationStore(opt =>
                 {
-                    opt.ConfigureDbContext = o => o.UseSqlServer(Configuration.GetConnectionString("sqlConnection"),
+                    opt.ConfigureDbContext = c => c.UseSqlServer(Configuration.GetConnectionString("sqlConnection"),
                         sql => sql.MigrationsAssembly(migrationAssembly));
-                });
+                })
+            .AddOperationalStore(opt =>
+            {
+                opt.ConfigureDbContext = o => o.UseSqlServer(Configuration.GetConnectionString("sqlConnection"),
+                    sql => sql.MigrationsAssembly(migrationAssembly));
+            });
 
             services.AddControllersWithViews();
         }
