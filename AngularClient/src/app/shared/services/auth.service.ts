@@ -32,6 +32,10 @@ export class AuthService {
     return this._userManager.signinRedirect();
   }
 
+  public signinSilent(): Promise<User> {
+    return this.userManager.signinSilent();
+  }
+
   public isAuthenticated = (): Promise<boolean> => {
     return this._userManager.getUser()
     .then(user => {
